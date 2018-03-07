@@ -96,7 +96,7 @@ def compareRolls(firstRoll, secondRoll):
         return Result.tie
     if sortedRolls.winner == firstRoll:
         return Result.win
-    if ssortedRolls.winner == secondRoll:
+    if sortedRolls.winner == secondRoll:
         return Result.win
 
 def rollXTime(timesToRoll, firstDie, secondDie):
