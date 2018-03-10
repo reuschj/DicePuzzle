@@ -59,14 +59,21 @@ class RollGroup(object):
     """represents a group of rolls"""
 
     def __init__(self, listOfRolls):
-        self.rolls = listOfRolls
+        self.rolls = sortRolls(listOfRolls)
         self.rollCount = len(listOfRolls)
-        self.winner = sortRolls(listOfRolls)[0].die
-        self.runnerUp = sortRolls(listOfRolls)[1].die
-        self.lastPlace = sortRolls(listOfRolls)[len(resultList) - 1].die
-        self.winningResult = sortRolls(listOfRolls)[0].result
-        self.runnerUpResult = sortRolls(listOfRolls)[1].result
-        self.lastPlaceResult = sortRolls(listOfRolls)[len(resultList) - 1].result
+        # Determine if there are mulitple winners
+        winnerIndex = 0 # Intialize winnerIndex
+        winnerList = [self.rolls[winnerIndex]] # Add the first value to winner list
+        while winnerIndex < self.rollCount - 1 && self.rolls[winnerIndex].result == self.rolls[winnerIndex + 1].result:
+            winnerIndex += 1 # Increments winnerIndex
+            winnerList.append(self.rolls[winnerIndex]) # Adds the next value to the winner list if equal to the first
+        if winnerIndex < self.rollCount - 1:
+            runnerUpIndex = winnerIndex + 1 # Initializes runner-up index as
+            self.runnersUp = sortRolls(listOfRolls)[runnerUpIndex]
+        else:
+            self.runnersUp = nil
+        self.winners = winnerList
+        self.lastPlace = sortRolls(listOfRolls)[len(resultList) - 1]
 
     def __str__(self):
         return "There were %s rolls. %s was the winner with a roll of %s beating %s with a roll of %s." % (self.rollCount, self.winner, self.winningResult, self.runnerUp, self.runnerUpResult)
