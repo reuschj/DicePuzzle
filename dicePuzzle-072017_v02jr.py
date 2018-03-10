@@ -86,20 +86,25 @@ class Result(enum.Enum):
 # Define Functions to Run Program
 #_________________________________________________________________________________________
 
-# Returns
+# Returns a roll object given a die
 def rollDie(dieToRoll):
     rolledSide = random.randint(0, len(dieToRoll.sides) - 1)
     return Roll(dieToRoll, dieToRoll.sides[rolledSide])
 
+# Returns a sorted roll group, given a list of rolls
 def sortRolls(listOfRolls):
     sortedList = sorted(listOfRolls, key=lambda roll: roll.result)
     return RollGroup(sortedList)
 
+# Returns a win result if first die roll is greater, loss if first die roll is less and tie if rolls are even
 def compareRolls(firstRoll, secondRoll):
     sortedRolls = sortRolls([firstRoll, secondRoll])
     if sortedRolls.winner == sortedRolls.lastPlace:
         return Result.tie
-    return sortedRolls
+    if sortedRolls.winner == firstRoll:
+        return Result.win
+    if sortedRolls.winner == secondRoll:
+        return Result.win
 
 def rollXTime(timesToRoll, firstDie, secondDie):
     results = []
