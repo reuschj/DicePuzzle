@@ -62,21 +62,43 @@ class RollGroup(object):
         self.rolls = sortRolls(listOfRolls)
         self.rollCount = len(listOfRolls)
         # Determine if there are mulitple winners
+        # Make a list of winners
         winnerIndex = 0 # Intialize winnerIndex
         winnerList = [self.rolls[winnerIndex]] # Add the first value to winner list
-        while winnerIndex < self.rollCount - 1 && self.rolls[winnerIndex].result == self.rolls[winnerIndex + 1].result:
-            winnerIndex += 1 # Increments winnerIndex
+        while winnerIndex < self.rollCount - 1 and self.rolls[winnerIndex].result == self.rolls[winnerIndex + 1].result:
+            winnerIndex += 1
             winnerList.append(self.rolls[winnerIndex]) # Adds the next value to the winner list if equal to the first
         if winnerIndex < self.rollCount - 1:
+            # Make list of runners up
             runnerUpIndex = winnerIndex + 1 # Initializes runner-up index as
-            self.runnersUp = sortRolls(listOfRolls)[runnerUpIndex]
+            runnersUpList = [sortRolls(listOfRolls)[runnerUpIndex]]
+            while runnerUpIndex < self.rollCount - 1 and self.rolls[runnerUpIndex].result == self.rolls[runnerUpIndex + 1].result:
+                runnerUpIndex += 1
+                runnersUpList.append(self.rolls[runnerUpIndex]);
         else:
+            # There are no runners up if all are tied for first
             self.runnersUp = nil
+        # Make list of last place finishers
+        lastPlaceIndex = len(resultList) - 1
+        lastPlaceList = [sortRolls(listOfRolls)[lastPlaceIndex]]
+        while lastPlaceIndex > 0 and self.rolls[lastPlaceIndex].result == self.rolls[lastPlaceIndex - 1].result:
+            lastPlaceIndex -= 1
+            lastPlaceList.append(self.rolls[lastPlaceIndex])
+        # Add the winner object properties
         self.winners = winnerList
-        self.lastPlace = sortRolls(listOfRolls)[len(resultList) - 1]
+        self.winningResult = self.winners[0].result
+        self.winningDies = buildListSting(self.winners)
+        # Add the runner up object properties
+        self.runnersUp = runnersUpList
+        self.runnersUpResult = self.runnersUp[0].result
+        self.runnersUpDies = buildListSting(self.runnersUp)
+        # Add the last place object properties
+        self.lastPlace = lastPlaceList
+        self.lastPlaceResult = self.lastPlace[0].result
+        self.lastPlaceDies = buildListSting(self.lastPlace)
 
     def __str__(self):
-        return "There were %s rolls. %s was the winner with a roll of %s beating %s with a roll of %s." % (self.rollCount, self.winner, self.winningResult, self.runnerUp, self.runnerUpResult)
+        return "There were %s rolls. %s was the winner with a roll of %s beating %s with a roll of %s. %s was last with a roll of %s." % (self.rollCount, self.winningDies, self.winningResult, self.runnersUpDies, self.runnersUpResult, self.lastPlaceDies, self.lastPlaceResult)
 
 class Result(enum.Enum):
     win = 1
@@ -85,6 +107,17 @@ class Result(enum.Enum):
 
 # Define Functions to Run Program
 #_________________________________________________________________________________________
+
+# Build a string describing a list
+def buildListSting(inputList):
+    outputString = ""
+    for i in range(len(inputList)):
+        if i == len(inputList) - 1 and i != 0:
+            outputString.append("and ")
+        elif i != len(inputList) - 1 and i != 0:
+            outputString.append(", ")
+        outputString.append(inputList[i])
+    return outputString
 
 # Returns a roll object given a die
 def rollDie(dieToRoll):
@@ -112,7 +145,7 @@ def rollXTime(timesToRoll, firstDie, secondDie):
     secondDieCounter = 0
     tiedCounter = 0
     for i in range(timesToRoll):
-        thisTime = compareDice(firstDie, secondDie)
+        thisTime = compareRolls(firstDie, secondDie)
         results.append(thisTime)
     for j in range(len(results)):
         if results[j] == firstDie:
