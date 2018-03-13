@@ -182,6 +182,7 @@ def compareRolls(firstRoll, secondRoll):
     if sortedRolls.winner == secondRoll:
         return Result.win
 
+# Needs a re-write
 def rollXTime(timesToRoll, firstDie, secondDie):
     results = []
     firstDieCounter = 0
