@@ -6,6 +6,7 @@ import random
 import sys
 import datetime
 import enum
+import operator
 
 # Define Objects
 #_________________________________________________________________________________________
@@ -33,7 +34,7 @@ class Person(object):
                 diceStatement += "Die %s (%s sides): %s" % (str(i + 1), str(self.dice[i].numSides), buildListString(self.dice[i].sides))
                 if i < numDice - 1:
                     diceStatement += "\n"
-        return "\nI am %s. %s" % (self.name, diceStatement)
+        return "\nI'm %s. %s" % (self.name, diceStatement)
 
     def getDie(self, die):
         self.dice.append(die)
@@ -94,7 +95,7 @@ class RollGroup(object):
     """represents a group of rolls"""
 
     def __init__(self, listOfRolls):
-        self.rolls = sortRolls(listOfRolls)
+        self.rolls = sortRolls(listOfRolls, True)
         self.rollCount = len(listOfRolls)
         # Determine if there are mulitple winners
         # Make a list of winners
@@ -106,7 +107,7 @@ class RollGroup(object):
         if winnerIndex < self.rollCount - 1:
             # Make list of runners up
             runnerUpIndex = winnerIndex + 1 # Initializes runner-up index as
-            runnersUpList = [sortRolls(listOfRolls)[runnerUpIndex]]
+            runnersUpList = [sortRolls(listOfRolls, True)[runnerUpIndex]]
             while runnerUpIndex < self.rollCount - 1 and self.rolls[runnerUpIndex].result == self.rolls[runnerUpIndex + 1].result:
                 runnerUpIndex += 1
                 runnersUpList.append(self.rolls[runnerUpIndex]);
@@ -114,8 +115,8 @@ class RollGroup(object):
             # There are no runners up if all are tied for first
             self.runnersUp = nil
         # Make list of last place finishers
-        lastPlaceIndex = len(resultList) - 1
-        lastPlaceList = [sortRolls(listOfRolls)[lastPlaceIndex]]
+        lastPlaceIndex = len(listOfRolls) - 1
+        lastPlaceList = [sortRolls(listOfRolls, True)[lastPlaceIndex]]
         while lastPlaceIndex > 0 and self.rolls[lastPlaceIndex].result == self.rolls[lastPlaceIndex - 1].result:
             lastPlaceIndex -= 1
             lastPlaceList.append(self.rolls[lastPlaceIndex])
@@ -168,9 +169,9 @@ def rollDie(dieToRoll):
     return Roll(dieToRoll, dieToRoll.sides[rolledSide])
 
 # Returns a sorted roll group, given a list of rolls
-def sortRolls(listOfRolls):
-    sortedList = sorted(listOfRolls, key=lambda roll: roll.result)
-    return RollGroup(sortedList)
+def sortRolls(listOfRolls, reversed = False):
+    sortedList = sorted(listOfRolls, key=lambda roll: roll.result, reverse=reversed)
+    return sortedList
 
 # Returns a win result if first die roll is greater, loss if first die roll is less and tie if rolls are even
 def compareRolls(firstRoll, secondRoll):
@@ -182,27 +183,35 @@ def compareRolls(firstRoll, secondRoll):
     if sortedRolls.winner == secondRoll:
         return Result.win
 
-# Needs a re-write
-def rollXTime(timesToRoll, firstDie, secondDie):
-    results = []
-    firstDieCounter = 0
-    secondDieCounter = 0
-    tiedCounter = 0
+# Rough working pass
+def rollXTimes(timesToRoll, listOfDiceToRoll):
+    winCounter = []
+    for i in range(len(listOfDiceToRoll)):
+        currentDie = {"name": listOfDiceToRoll[i].name, "wins": 0}
+        winCounter.append(currentDie)
+    print(winCounter)
+    allRolls = []
     for i in range(timesToRoll):
-        thisTime = compareRolls(firstDie, secondDie)
-        results.append(thisTime)
-    for j in range(len(results)):
-        if results[j] == firstDie:
-            firstDieCounter += 1
-        if results[j] == secondDie:
-            secondDieCounter += 1
-        if results[j] == "Tied":
-            tiedCounter += 1
-    output = []
-    output.append(firstDieCounter)
-    output.append(secondDieCounter)
-    output.append(tiedCounter)
-    return output
+        currentRollGroup = []
+        for j in range(len(listOfDiceToRoll)):
+            currentRoll = listOfDiceToRoll[j].roll()
+            currentRollGroup.append(currentRoll)
+        allRolls.append(RollGroup(sortRolls(currentRollGroup)))
+    for i in range(len(allRolls)):
+        print("\nRoll " + str(i + 1) + "\n-------------")
+        print("Winning Result: " + str(allRolls[i].winningResult))
+        print("Runner Up Result: " + str(allRolls[i].runnersUpResult))
+        print("Last Place Result: " + str(allRolls[i].lastPlaceResult))
+        print("Winners:")
+        for j in range(len(allRolls[i].winners)):
+            for k in range(len(winCounter)):
+                if allRolls[i].winners[j].die.name == winCounter[k]['name']:
+                    winCounter[k]['wins'] += 1
+            print(allRolls[i].winners[j].die.owner.name)
+    winCounter.sort(key=operator.itemgetter('wins'), reverse=True)
+    print("\n")
+    for i in range(len(winCounter)):
+        print("%s: %s wins" % (str(winCounter[i]['name']), str(winCounter[i]['wins'])))
 
 
 # Actions
@@ -215,18 +224,35 @@ timesToRoll = 100
 # Makes the people
 Katherine = Person("Katherine")
 Zack = Person("Zack")
+Justin = Person("Justin")
+Hang = Person("Hang")
 
 # Makes the dice
 die01 = Die([3,3,3,3,3,6], Katherine)
 die02 = Die([2,2,2,5,5,5], Zack)
+die03 = Die([3,3,3,3,3,6], Justin)
+die04 = Die([2,2,2,5,5,5], Hang)
+die05 = Die([1,2,3,4,5,6], Justin)
+die06 = Die([1,2,3,4,5,6], Hang)
 print(Katherine)
 print(Zack)
+print(Justin)
+print(Hang)
 
 roll01 = die01.roll()
 roll02 = die02.roll()
+roll03 = die05.roll()
+roll04 = die06.roll()
 print(roll01)
 print(roll02)
 print(roll01.compareTo(roll02))
+print(roll03)
+print(roll04)
+print(roll03.compareTo(roll04))
+print(roll04.compareTo(roll03))
+
+rollXTimes(10,[die01, die02, die03, die04])
+print("\n")
 
 #Perform the roll
 # results = rollXTime(timesToRoll, Katherine, Zack)
