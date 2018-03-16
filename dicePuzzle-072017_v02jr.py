@@ -187,8 +187,8 @@ def compareRolls(firstRoll, secondRoll):
 def rollXTimes(timesToRoll, listOfDiceToRoll):
     winCounter = []
     for i in range(len(listOfDiceToRoll)):
-        currentDie = {"name": listOfDiceToRoll[i].name, "wins": 0}
-        winCounter.append(currentDie)
+        initDie = {"name": listOfDiceToRoll[i].name, "wins": 0, "ties": 0, "losses": 0}
+        winCounter.append(initDie)
     print(winCounter)
     allRolls = []
     for i in range(timesToRoll):
@@ -206,12 +206,19 @@ def rollXTimes(timesToRoll, listOfDiceToRoll):
         for j in range(len(allRolls[i].winners)):
             for k in range(len(winCounter)):
                 if allRolls[i].winners[j].die.name == winCounter[k]['name']:
-                    winCounter[k]['wins'] += 1
+                    if len(allRolls[i].winners) > 1:
+                        winCounter[k]['ties'] += 1
+                    else:
+                        winCounter[k]['wins'] += 1
             print(allRolls[i].winners[j].die.owner.name)
+        for j in range(len(allRolls[i].lastPlace)):
+            for k in range(len(winCounter)):
+                if allRolls[i].lastPlace[j].die.name == winCounter[k]['name']:
+                    winCounter[k]['losses'] += 1
     winCounter.sort(key=operator.itemgetter('wins'), reverse=True)
     print("\n")
     for i in range(len(winCounter)):
-        print("%s: %s wins" % (str(winCounter[i]['name']), str(winCounter[i]['wins'])))
+        print("%s: %s wins, %s ties, %s losses" % (str(winCounter[i]['name']), str(winCounter[i]['wins']),str(winCounter[i]['ties']),str(winCounter[i]['losses'])))
 
 
 # Actions
