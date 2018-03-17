@@ -134,7 +134,52 @@ class RollGroup(object):
         self.lastPlaceDies = buildListString(self.lastPlace)
 
     def __str__(self):
-        return "There were %s rolls. %s was the winner with a roll of %s beating %s with a roll of %s. %s was last with a roll of %s." % (self.rollCount, self.winningDies, self.winningResult, self.runnersUpDies, self.runnersUpResult, self.lastPlaceDies, self.lastPlaceResult)
+        returnStr = "\n"
+        returnStr += "Winning Result: " + str(self.winningResult) + "\n"
+        returnStr += "Runner Up Result: " + str(self.runnersUpResult) + "\n"
+        returnStr += "Last Place Result: " + str(self.lastPlaceResult) + "\n"
+        winnerList = []
+        for i in range(len(self.winners)):
+            winnerList.append(self.winners[i].die.owner.name)
+        returnStr += "Winners: " + buildListString(winnerList) + "\n"
+        return returnStr
+
+class ResultCounter(object):
+    """represents the counts of wins, ties and losses for a die"""
+
+    def __init__(self, die):
+        self.die = die
+        self.win = 0
+        self.tie = 0
+        self.loss = 0
+        self.results = []
+        self.totalScore = sum(result.value for result in self.results)
+
+    def __str__(self):
+        return "%s: Total score of %s with %s wins, %s ties and %s losses" % (self.die.name, str(self.totalScore), str(self.win), str(self.tie), str(self.loss))
+
+    def reset(self):
+        self.win = 0
+        self.tie = 0
+        self.loss = 0
+        self.results = []
+        self.totalScore = sum(result.value for result in self.results)
+
+    def addWin(self):
+        self.win += 1
+        self.results.append(Result.win)
+        self.totalScore = sum(result.value for result in self.results)
+
+    def addTie(self):
+        self.tie += 1
+        self.results.append(Result.tie)
+        self.totalScore = sum(result.value for result in self.results)
+
+    def addLoss(self):
+        self.loss += 1
+        self.results.append(Result.loss)
+        self.totalScore = sum(result.value for result in self.results)
+
 
 class Result(enum.Enum):
     win = 1
@@ -152,8 +197,6 @@ class Result(enum.Enum):
 # Define Functions to Run Program
 #_________________________________________________________________________________________
 
-<<<<<<< HEAD
-=======
 # Build a string describing a list
 def buildListString(inputList):
     outputString = ""
@@ -165,22 +208,15 @@ def buildListString(inputList):
         outputString += str(inputList[i])
     return outputString
 
->>>>>>> 14f4f50aa514d14f0a8c4c2a87274b9135f230ee
 # Returns a roll object given a die
 def rollDie(dieToRoll):
     rolledSide = random.randint(0, len(dieToRoll.sides) - 1)
     return Roll(dieToRoll, dieToRoll.sides[rolledSide])
 
 # Returns a sorted roll group, given a list of rolls
-<<<<<<< HEAD
-def sortRolls(listOfRolls):
-    sortedList = sorted(listOfRolls, key=lambda roll: roll.result)
-    return RollGroup(sortedList)
-=======
 def sortRolls(listOfRolls, reversed = False):
     sortedList = sorted(listOfRolls, key=lambda roll: roll.result, reverse=reversed)
     return sortedList
->>>>>>> 14f4f50aa514d14f0a8c4c2a87274b9135f230ee
 
 # Returns a win result if first die roll is greater, loss if first die roll is less and tie if rolls are even
 def compareRolls(firstRoll, secondRoll):
@@ -194,11 +230,9 @@ def compareRolls(firstRoll, secondRoll):
 
 # Rough working pass
 def rollXTimes(timesToRoll, listOfDiceToRoll):
-    winCounter = []
+    allResults = []
     for i in range(len(listOfDiceToRoll)):
-        initDie = {"name": listOfDiceToRoll[i].name, "wins": 0, "ties": 0, "losses": 0}
-        winCounter.append(initDie)
-    print(winCounter)
+        allResults.append(ResultCounter(listOfDiceToRoll[i]))
     allRolls = []
     for i in range(timesToRoll):
         currentRollGroup = []
@@ -208,26 +242,23 @@ def rollXTimes(timesToRoll, listOfDiceToRoll):
         allRolls.append(RollGroup(sortRolls(currentRollGroup)))
     for i in range(len(allRolls)):
         print("\nRoll " + str(i + 1) + "\n-------------")
-        print("Winning Result: " + str(allRolls[i].winningResult))
-        print("Runner Up Result: " + str(allRolls[i].runnersUpResult))
-        print("Last Place Result: " + str(allRolls[i].lastPlaceResult))
-        print("Winners:")
+        print(allRolls[i])
         for j in range(len(allRolls[i].winners)):
-            for k in range(len(winCounter)):
-                if allRolls[i].winners[j].die.name == winCounter[k]['name']:
+            for k in range(len(allResults)):
+                if allRolls[i].winners[j].die.name == allResults[k].die.name:
                     if len(allRolls[i].winners) > 1:
-                        winCounter[k]['ties'] += 1
+                        allResults[k].addTie()
                     else:
-                        winCounter[k]['wins'] += 1
-            print(allRolls[i].winners[j].die.owner.name)
-        for j in range(len(allRolls[i].lastPlace)):
-            for k in range(len(winCounter)):
-                if allRolls[i].lastPlace[j].die.name == winCounter[k]['name']:
-                    winCounter[k]['losses'] += 1
-    winCounter.sort(key=operator.itemgetter('wins'), reverse=True)
+                        allResults[k].addWin()
+        if len(allRolls[i].lastPlace) == 1:
+            for j in range(len(allRolls[i].lastPlace)):
+                for k in range(len(allResults)):
+                    if allRolls[i].lastPlace[j].die.name == allResults[k].die.name:
+                        allResults[k].addLoss()
+    allResultsSorted = sorted(allResults, key=lambda score: score.totalScore, reverse=True)
     print("\n")
-    for i in range(len(winCounter)):
-        print("%s: %s wins, %s ties, %s losses" % (str(winCounter[i]['name']), str(winCounter[i]['wins']),str(winCounter[i]['ties']),str(winCounter[i]['losses'])))
+    for i in range(len(allResultsSorted)):
+        print(allResultsSorted[i])
 
 
 # Actions
