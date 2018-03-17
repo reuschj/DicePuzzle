@@ -229,7 +229,7 @@ def compareRolls(firstRoll, secondRoll):
         return Result.win
 
 # Rough working pass
-def rollXTimes(timesToRoll, listOfDiceToRoll):
+def rollXTimes(timesToRoll, listOfDiceToRoll, showAllResults = False):
     allResults = []
     for i in range(len(listOfDiceToRoll)):
         allResults.append(ResultCounter(listOfDiceToRoll[i]))
@@ -241,8 +241,9 @@ def rollXTimes(timesToRoll, listOfDiceToRoll):
             currentRollGroup.append(currentRoll)
         allRolls.append(RollGroup(sortRolls(currentRollGroup)))
     for i in range(len(allRolls)):
-        print("\nRoll " + str(i + 1) + "\n-------------")
-        print(allRolls[i])
+        if showAllResults == True:
+            print("\nRoll " + str(i + 1) + "\n-------------")
+            print(allRolls[i])
         for j in range(len(allRolls[i].winners)):
             for k in range(len(allResults)):
                 if allRolls[i].winners[j].die.name == allResults[k].die.name:
@@ -298,7 +299,7 @@ print(roll04)
 print(roll03.compareTo(roll04))
 print(roll04.compareTo(roll03))
 
-rollXTimes(10,[die01, die02, die03, die04])
+rollXTimes(10,[die01, die02, die03, die04], True)
 print("\n")
 
 #Perform the roll
