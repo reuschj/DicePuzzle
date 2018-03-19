@@ -141,7 +141,11 @@ class RollGroup(object):
         winnerList = []
         for i in range(len(self.winners)):
             winnerList.append(self.winners[i].die.owner.name)
-        returnStr += "Winners: " + buildListString(winnerList) + "\n"
+        if len(self.winners) == 1:
+            returnStr += "Winner: "
+        else:
+            returnStr += "Tied for first: "
+        returnStr += buildListString(winnerList) + "\n"
         return returnStr
 
 class ResultCounter(object):
@@ -156,7 +160,7 @@ class ResultCounter(object):
         self.totalScore = sum(result.value for result in self.results)
 
     def __str__(self):
-        return "%s: Total score of %s with %s wins, %s ties and %s losses" % (self.die.name, str(self.totalScore), str(self.win), str(self.tie), str(self.loss))
+        return "%s: Total score: %s [ Wins: %s (%s) | Ties: %s (%s) | Losses: %s (%s) ]" % (self.die.name, str(self.totalScore), str(self.win), self.winPercent, str(self.tie), self.tiePercent, str(self.loss), self.lossPercent)
 
     def reset(self):
         self.win = 0
@@ -164,21 +168,43 @@ class ResultCounter(object):
         self.loss = 0
         self.results = []
         self.totalScore = sum(result.value for result in self.results)
+        self.winPercent = Percent(self.win / len(self.results))
+        self.tiePercent = Percent(self.tie / len(self.results))
+        self.lossPercent = Percent(self.loss / len(self.results))
 
     def addWin(self):
         self.win += 1
         self.results.append(Result.win)
         self.totalScore = sum(result.value for result in self.results)
+        self.winPercent = Percent(self.win / len(self.results))
+        self.tiePercent = Percent(self.tie / len(self.results))
+        self.lossPercent = Percent(self.loss / len(self.results))
 
     def addTie(self):
         self.tie += 1
         self.results.append(Result.tie)
         self.totalScore = sum(result.value for result in self.results)
+        self.winPercent = Percent(self.win / len(self.results))
+        self.tiePercent = Percent(self.tie / len(self.results))
+        self.lossPercent = Percent(self.loss / len(self.results))
 
     def addLoss(self):
         self.loss += 1
         self.results.append(Result.loss)
         self.totalScore = sum(result.value for result in self.results)
+        self.winPercent = Percent(self.win / len(self.results))
+        self.tiePercent = Percent(self.tie / len(self.results))
+        self.lossPercent = Percent(self.loss / len(self.results))
+
+class Percent(object):
+    """represents the percentage format of a decimal input"""
+
+    def __init__(self, decimalInput):
+        self.value = int(round(decimalInput * 100))
+        self.inital = self
+
+    def __str__(self):
+        return "%s%%" % (str(self.value))
 
 
 class Result(enum.Enum):
@@ -258,6 +284,8 @@ def rollXTimes(timesToRoll, listOfDiceToRoll, showAllResults = False):
                         allResults[k].addLoss()
     allResultsSorted = sorted(allResults, key=lambda score: score.totalScore, reverse=True)
     print("\n")
+    print("Rolls: %s | Winner: %s" % (str(timesToRoll), str(allResultsSorted[0].die.owner.name)))
+    print("-------------")
     for i in range(len(allResultsSorted)):
         print(allResultsSorted[i])
 
@@ -266,8 +294,7 @@ def rollXTimes(timesToRoll, listOfDiceToRoll, showAllResults = False):
 #_________________________________________________________________________________________
 
 #Load the CSV file to a variable
-# timesToRoll = int(input("How many times would you like to roll? "))``
-timesToRoll = 100
+timesToRoll = int(input("How many times would you like to roll? "))
 
 # Makes the people
 Katherine = Person("Katherine")
@@ -300,6 +327,8 @@ print(roll03.compareTo(roll04))
 print(roll04.compareTo(roll03))
 
 rollXTimes(10,[die01, die02, die03, die04], True)
+rollXTimes(timesToRoll,[die01, die02], False)
+rollXTimes(timesToRoll,[die01, die02, die05, die06], False)
 print("\n")
 
 #Perform the roll
