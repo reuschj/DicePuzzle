@@ -188,6 +188,12 @@ class ResultCounter(object):
         self.tiePercent = Percent(self.tie / len(self.results))
         self.lossPercent = Percent(self.loss / len(self.results))
 
+    def addNone(self):
+        self.results.append(Result.none)
+        self.winPercent = Percent(self.win / len(self.results))
+        self.tiePercent = Percent(self.tie / len(self.results))
+        self.lossPercent = Percent(self.loss / len(self.results))
+
     def addLoss(self):
         self.loss += 1
         self.results.append(Result.loss)
@@ -210,6 +216,7 @@ class Percent(object):
 class Result(enum.Enum):
     win = 1
     tie = 0
+    none = 0
     loss = -1
 
     def __str__(self):
@@ -217,8 +224,10 @@ class Result(enum.Enum):
             return "\nWin"
         elif self == Result.loss:
             return "\nLoss"
-        else:
+        elif self == Result.tie:
             return "\nTie"
+        else:
+            return "\nNone"
 
 # Define Functions to Run Program
 #_________________________________________________________________________________________
@@ -277,11 +286,11 @@ def rollXTimes(timesToRoll, listOfDiceToRoll, showAllResults = False):
                         allResults[k].addTie()
                     else:
                         allResults[k].addWin()
-        if len(allRolls[i].lastPlace) == 1:
-            for j in range(len(allRolls[i].lastPlace)):
-                for k in range(len(allResults)):
-                    if allRolls[i].lastPlace[j].die.name == allResults[k].die.name:
+                elif len(allRolls[i].lastPlace) == 1:
+                    if allRolls[i].lastPlace[0].die.name == allResults[k].die.name:
                         allResults[k].addLoss()
+                else:
+                    allResults[k].addNone()
     allResultsSorted = sorted(allResults, key=lambda score: score.totalScore, reverse=True)
     print("\n")
     print("Rolls: %s | Winner: %s" % (str(timesToRoll), str(allResultsSorted[0].die.owner.name)))
