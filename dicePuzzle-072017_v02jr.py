@@ -303,49 +303,75 @@ def rollXTimes(timesToRoll, listOfDiceToRoll, showAllResults = False):
 #_________________________________________________________________________________________
 
 #Load the CSV file to a variable
+print("\n")
 timesToRoll = int(input("How many times would you like to roll? "))
 
-# Makes the people
+# ----------------------------------------
+print("\n-------------")
+
+# Make the people
 Katherine = Person("Katherine")
 Zack = Person("Zack")
 Justin = Person("Justin")
 Hang = Person("Hang")
 
-# Makes the dice
-die01 = Die([3,3,3,3,3,6], Katherine)
-die02 = Die([2,2,2,5,5,5], Zack)
-die03 = Die([3,3,3,3,3,6], Justin)
-die04 = Die([2,2,2,5,5,5], Hang)
-die05 = Die([1,2,3,4,5,6], Justin)
-die06 = Die([1,2,3,4,5,6], Hang)
+# Make the dice
+dice = []
+dice.append( Die([3,3,3,3,3,6], Katherine) ) #0
+dice.append( Die([2,2,2,5,5,5], Zack) ) #1
+dice.append( Die([3,3,3,3,3,6], Justin) ) #2
+dice.append( Die([2,2,2,5,5,5], Hang) ) #3
+dice.append( Die([1,2,3,4,5,6], Justin) ) #4
+dice.append( Die([1,2,3,4,5,6], Hang) ) #5
+
+# Roll the dice
+rolls = []
+for i in range(len(dice)):
+    rolls.append( dice[i].roll() )
+
+# ----------------------------------------
+print("\n-------------")
+
+# Introduce people
+print("\nIntroducing...")
 print(Katherine)
 print(Zack)
 print(Justin)
 print(Hang)
 
-roll01 = die01.roll()
-roll02 = die02.roll()
-roll03 = die05.roll()
-roll04 = die06.roll()
-print(roll01)
-print(roll02)
-print(roll01.compareTo(roll02))
-print(roll03)
-print(roll04)
-print(roll03.compareTo(roll04))
-print(roll04.compareTo(roll03))
+# ----------------------------------------
+print("\n-------------")
 
-rollXTimes(10,[die01, die02, die03, die04], True)
-rollXTimes(timesToRoll,[die01, die02], False)
-rollXTimes(timesToRoll,[die01, die02, die05, die06], False)
+# Print a few single rolls
+print("\nLet's roll 2 dice...")
+print(rolls[0])
+print(rolls[1])
+# Let's compare them...
+print(rolls[0].compareTo(rolls[1]))
+
+print("\n-------------")
+
+# Print a few more single rolls
+print("\nLet's roll 2 more...")
+print(rolls[4])
+print(rolls[5])
+# Let's compare them...
+print(rolls[4].compareTo(rolls[5]))
+print(rolls[5].compareTo(rolls[4]))
+
+# ----------------------------------------
+print("\n-------------")
+
+# Roll the first 4 dice 10 times, printing each roll result
+print("Rolling 10 times...")
+rollXTimes(10,[dice[0], dice[1], dice[2], dice[3]], True)
+
+# ----------------------------------------
+print("\n-------------")
+
+# Roll just dice 1 and 2 the inputed amount of times
+rollXTimes(timesToRoll,[dice[0], dice[1]], False)
+
+# Roll just dice 1, 2, 5 and 6 the inputed amount of times
+rollXTimes(timesToRoll,[dice[0], dice[1], dice[4], dice[5]], False)
 print("\n")
-
-#Perform the roll
-# results = rollXTime(timesToRoll, Katherine, Zack)
-# print("%s: %s, %s: %s, Tied: %s" % (Katherine.name, results[0], Zack.name, results[1], results[2]))
-# if results[0] > results[1] and results[0] > results[2]:
-#     print("%s won with %d%%." % (Katherine.name, 100*(float(results[0])/float(timesToRoll))))
-# if results[1] > results[0] and results[1] > results[2]:
-#     print("%s won with %d%%." % (Zack.name, 100*(float(results[1])/float(timesToRoll))))
-# if results[2] > results[0] and results[2] > results[1]:
-#     print("The ties won with %d%%." % 100*(float(results[2])/float(timesToRoll)))
