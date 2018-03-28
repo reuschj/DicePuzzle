@@ -114,7 +114,7 @@ class RollGroup(object):
                 runnersUpList.append(self.rolls[runnerUpIndex]);
         else:
             # There are no runners up if all are tied for first
-            self.runnersUp = nil
+            runnersUpList = []
         # Make list of last place finishers
         lastPlaceIndex = len(listOfRolls) - 1
         lastPlaceList = [sortRolls(listOfRolls, True)[lastPlaceIndex]]
@@ -127,8 +127,12 @@ class RollGroup(object):
         self.winningDies = buildListString(self.winners)
         # Add the runner up object properties
         self.runnersUp = runnersUpList
-        self.runnersUpResult = self.runnersUp[0].result
-        self.runnersUpDies = buildListString(self.runnersUp)
+        if len(self.runnersUp) > 0:
+            self.runnersUpResult = self.runnersUp[0].result
+            self.runnersUpDies = buildListString(self.runnersUp)
+        else:
+            self.runnersUpResult = None
+            self.runnersUpDies = None
         # Add the last place object properties
         self.lastPlace = lastPlaceList
         self.lastPlaceResult = self.lastPlace[0].result
