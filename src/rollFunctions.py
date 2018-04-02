@@ -30,7 +30,7 @@ def compareRolls(firstRoll, secondRoll):
     if sortedRolls.winner == secondRoll:
         return Result.win
 
-# Rough working pass
+# Rolls a set of dice a given number of times
 def rollXTimes(timesToRoll, listOfDiceToRoll, showAllResults = False):
     from classes import RollGroup
     from classes import ResultCounter
@@ -50,16 +50,20 @@ def rollXTimes(timesToRoll, listOfDiceToRoll, showAllResults = False):
             print(allRolls[i])
         for j in range(len(allRolls[i].winners)):
             for k in range(len(allResults)):
-                if allRolls[i].winners[j].die.name == allResults[k].die.name:
+                if allRolls[i].winners[j].die == allResults[k].die:
                     if len(allRolls[i].winners) > 1:
                         allResults[k].addTie()
+                        print("addTie to " + str(allResults[k].die.name))
                     else:
                         allResults[k].addWin()
+                        print("addWin to " + str(allResults[k].die.name))
                 elif len(allRolls[i].lastPlace) == 1:
-                    if allRolls[i].lastPlace[0].die.name == allResults[k].die.name:
+                    if allRolls[i].lastPlace[0].die == allResults[k].die:
                         allResults[k].addLoss()
+                        print("addTie to " + str(allResults[k].die.name))
                 else:
                     allResults[k].addNone()
+                    print("addTie to " + str(allResults[k].die.name))
     allResultsSorted = sorted(allResults, key=lambda score: score.totalScore, reverse=True)
     returnStr = "Rolls: %s | Winner: %s" % (str(timesToRoll), str(allResultsSorted[0].die.owner.name)) + "\n"
     returnStr += "-------------\n"

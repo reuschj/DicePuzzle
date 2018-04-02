@@ -160,25 +160,29 @@ class ResultCounter(object):
         self.die = die
         self.win = 0
         self.tie = 0
+        self.none = 0
         self.loss = 0
         self.results = []
         self.totalScore = sum(result.value for result in self.results)
         self.winPercent = 0
         self.tiePercent = 0
+        self.nonePercent = 0
         self.lossPercent = 0
 
     def __str__(self):
-        return "%s: Total score: %s [ Wins: %s (%s) | Ties: %s (%s) | Losses: %s (%s) ]" % (self.die.name, str(self.totalScore), str(self.win), self.winPercent, str(self.tie), self.tiePercent, str(self.loss), self.lossPercent)
+        return "%s: Total score: %s [ Wins: %s (%s) | Ties: %s (%s) | Losses: %s (%s) | No Result: %s (%s) ]" % (self.die.name, str(self.totalScore), str(self.win), self.winPercent, str(self.tie), self.tiePercent, str(self.loss), self.lossPercent, str(self.none), self.nonePercent)
 
     def reset(self):
         self.win = 0
         self.tie = 0
+        self.none = 0
         self.loss = 0
         self.results = []
         self.totalScore = sum(result.value for result in self.results)
-        self.winPercent = Percent(self.win / len(self.results))
-        self.tiePercent = Percent(self.tie / len(self.results))
-        self.lossPercent = Percent(self.loss / len(self.results))
+        self.winPercent = 0
+        self.tiePercent = 0
+        self.nonePercent = 0
+        self.lossPercent = 0
 
     def addWin(self):
         self.win += 1
@@ -186,6 +190,7 @@ class ResultCounter(object):
         self.totalScore = sum(result.value for result in self.results)
         self.winPercent = Percent(self.win / len(self.results))
         self.tiePercent = Percent(self.tie / len(self.results))
+        self.nonePercent = Percent(self.none / len(self.results))
         self.lossPercent = Percent(self.loss / len(self.results))
 
     def addTie(self):
@@ -194,12 +199,15 @@ class ResultCounter(object):
         self.totalScore = sum(result.value for result in self.results)
         self.winPercent = Percent(self.win / len(self.results))
         self.tiePercent = Percent(self.tie / len(self.results))
+        self.nonePercent = Percent(self.none / len(self.results))
         self.lossPercent = Percent(self.loss / len(self.results))
 
     def addNone(self):
+        self.none += 1
         self.results.append(Result.none)
         self.winPercent = Percent(self.win / len(self.results))
         self.tiePercent = Percent(self.tie / len(self.results))
+        self.nonePercent = Percent(self.none / len(self.results))
         self.lossPercent = Percent(self.loss / len(self.results))
 
     def addLoss(self):
@@ -208,6 +216,7 @@ class ResultCounter(object):
         self.totalScore = sum(result.value for result in self.results)
         self.winPercent = Percent(self.win / len(self.results))
         self.tiePercent = Percent(self.tie / len(self.results))
+        self.nonePercent = Percent(self.none / len(self.results))
         self.lossPercent = Percent(self.loss / len(self.results))
 
 class Percent(object):
