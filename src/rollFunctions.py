@@ -34,36 +34,50 @@ def compareRolls(firstRoll, secondRoll):
 def rollXTimes(timesToRoll, listOfDiceToRoll, showAllResults = False):
     from classes import RollGroup
     from classes import ResultCounter
-    allResults = []
+    allResults = [] # To hold result counters
     for i in range(len(listOfDiceToRoll)):
+        # Initialize a result counter for each die to roll in allResults
         allResults.append(ResultCounter(listOfDiceToRoll[i]))
-    allRolls = []
+    allRolls = [] # To hold the rolls
     for i in range(timesToRoll):
-        currentRollGroup = []
+        currentRollGroup = [] # Holds each "turn" of rolling
         for j in range(len(listOfDiceToRoll)):
             currentRoll = listOfDiceToRoll[j].roll()
             currentRollGroup.append(currentRoll)
         allRolls.append(RollGroup(sortRolls(currentRollGroup)))
+    # Goes through all rolls and adds the counters
     for i in range(len(allRolls)):
+        # Prints the outcome of each roll (optional)
         if showAllResults == True:
             print("\nRoll " + str(i + 1) + "\n-------------")
             print(allRolls[i])
-        for j in range(len(allRolls[i].winners)):
-            for k in range(len(allResults)):
-                if allRolls[i].winners[j].die == allResults[k].die:
-                    if len(allRolls[i].winners) > 1:
-                        allResults[k].addTie()
-                        print("addTie to " + str(allResults[k].die.name))
-                    else:
-                        allResults[k].addWin()
-                        print("addWin to " + str(allResults[k].die.name))
-                elif len(allRolls[i].lastPlace) == 1:
-                    if allRolls[i].lastPlace[0].die == allResults[k].die:
-                        allResults[k].addLoss()
-                        print("addTie to " + str(allResults[k].die.name))
+        # Goes through each die and adds to the appropriate counter
+        for j in range(len(allResults)):
+            noResults = True # Resets... will change to false when result is found
+            # If there is a single winner (no tie for first)
+            if len(allRolls[i].winners) == 1:
+                # If the current die is the single winner
+                if allResults[j].die == allRolls[i].winners[0].die:
+                    allResults[j].addWin()
+                    noResults = False # Found a result
+            # If there are multiple winners (tie for first)
+            else:
+                # For each winner (tie)
+                for k in range(len(allRolls[i].winners)):
+                    # If the current die is in the winner (tie) list
+                    if allResults[j].die == allRolls[i].winners[k].die:
+                        allResults[j].addTie()
+                        noResults = False # Found a result
+            # If no winning or tie result was found
+            if noResults:
+                # If there is a single last place result (loss) and the current die is the single loser
+                if len(allRolls[i].lastPlace) == 1 and allResults[j].die == allRolls[i].lastPlace[0].die:
+                    allResults[j].addLoss()
+                    noResults = False # Found a result
+                # If the die has not matched a win, tie or loss, then count it as "no result"
                 else:
-                    allResults[k].addNone()
-                    print("addTie to " + str(allResults[k].die.name))
+                    allResults[j].addNone()
+    # Sort results by total score
     allResultsSorted = sorted(allResults, key=lambda score: score.totalScore, reverse=True)
     returnStr = "Rolls: %s | Winner: %s" % (str(timesToRoll), str(allResultsSorted[0].die.owner.name)) + "\n"
     returnStr += "-------------\n"
