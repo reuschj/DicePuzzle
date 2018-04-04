@@ -26,8 +26,6 @@ Bob = Person("Bob")
 dice = []
 dice.append( Die([3,3,3,3,3,6], Katherine) )
 dice.append( Die([2,2,2,5,5,5], Zack) )
-dice.append( Die([3,3,3,3,3,6], Justin) )
-dice.append( Die([2,2,2,5,5,5], Hang) )
 dice.append( Die([1,2,3,4,5,6], Justin) )
 dice.append( Die([1,2,3,4,5,6], Hang) )
 dice.append( Die([1,1,1,6,6,6], John) )

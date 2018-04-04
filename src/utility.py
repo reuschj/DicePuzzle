@@ -10,7 +10,7 @@ import operator
 # Define Functions to Run Program
 #_________________________________________________________________________________________
 
-# Build a string describing a list
+# Builds a string describing a list
 def buildListString(inputList):
     outputString = ""
     for i in range(len(inputList)):
